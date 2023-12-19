@@ -94,8 +94,7 @@ class Dyntastic(_TableMetadata, BaseModel):
         serialized_key = serialize(key)
 
         response = cls._dynamodb_table().get_item(Key=serialized_key, ConsistentRead=consistent_read)  # type: ignore
-        data = response.get("Item")
-        if data:
+        if data := response.get("Item"):
             return cls._dyntastic_load_model(data)
         else:
             raise DoesNotExist
@@ -399,8 +398,8 @@ class Dyntastic(_TableMetadata, BaseModel):
     def _dynamodb_type(cls, key: str) -> str:
         # Note: pragma nocover on the following line as coverage marks the ->exit branch as
         # being missed (since we can always find a field matching the key passed in)
-        python_type = next(field.type_ for field in cls.__fields__.values() if field.alias == key)  # pragma: nocover
-        if python_type == bytes:
+# pragma: nocover
+        if (python_type := next(field.type_ for field in cls.__fields__.values() if field.alias == key)) == bytes:
             return "B"
         elif python_type in (int, Decimal, float):
             return "N"

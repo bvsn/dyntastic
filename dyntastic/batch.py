@@ -19,9 +19,8 @@ def invoke_with_backoff(
         response = f(RequestItems=unprocessed_items)
         responses.append(response)
 
-        unprocessed_items = response[unprocessed_key]
 
-        if unprocessed_items:  # pragma: no cover
+        if unprocessed_items := response[unprocessed_key]:  # pragma: no cover
             attempts += 1
             if attempts > max_attempts:
                 raise Exception(f"Exceeded max attempts ({max_attempts}) to process unprocessed keys")
